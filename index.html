@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>我们的时光纪念册</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="importmap">
@@ -20,13 +20,17 @@
     @keyframes breathe-slow { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.02) translateY(-2px); } }
     @keyframes wiggle-soft { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
     @keyframes bounce-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    @keyframes float-gentle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
     @keyframes float-up { 0% { transform: translate(-50%, -10px); opacity: 1; } 100% { transform: translate(-50%, -40px); opacity: 0; } }
     @keyframes pop-in { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    
     .animate-breathe-slow { animation: breathe-slow 4s infinite ease-in-out; }
+    .animate-float-gentle { animation: float-gentle 3s infinite ease-in-out; }
     .animate-wiggle-soft { animation: wiggle-soft 0.8s ease-in-out; }
     .animate-bounce-soft { animation: bounce-soft 0.6s ease-in-out; }
     .animate-float-up { animation: float-up 1.5s ease-out forwards; }
     .animate-pop-in { animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    
     @keyframes pulseSlow { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } }
     .animate-pulse-slow { animation: pulseSlow 8s infinite ease-in-out; }
     .animation-delay-2000 { animation-delay: 2s; }
@@ -39,12 +43,12 @@
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check, Trash2, Download, Upload, Save } from 'lucide-react';
+    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check, Trash2, Download, Upload } from 'lucide-react';
 
     // --- 配置区域 ---
     const START_DATE = "2025-10-25"; 
 
-    // 初始演示回忆 (如果没有数据时显示)
+    // 初始演示回忆
     const INITIAL_MEMORIES = [
       {
         id: 1,
@@ -69,9 +73,8 @@
       </svg>
     );
 
-    // --- 棉花糖小羊 ---
+    // --- 棉花糖小羊 (修改版：无腿 + 大字) ---
     const AnimatedSheep = () => {
-      const [animationClass, setAnimationClass] = useState("animate-breathe-slow");
       const [message, setMessage] = useState("");
       const [showHeart, setShowHeart] = useState(false);
       const messages = ["咩~", "带我走!", "好想你!", "饿饿~", "贴贴 ❤️", "去玩嘛!", "再点一下!"];
@@ -79,44 +82,39 @@
       const handleClick = (e) => {
         e.stopPropagation();
         setShowHeart(true);
-        const actions = ["animate-bounce-soft", "animate-wiggle-soft"];
-        setAnimationClass(actions[Math.floor(Math.random() * actions.length)]);
         setMessage(messages[Math.floor(Math.random() * messages.length)]);
         setTimeout(() => {
-          setAnimationClass("animate-breathe-slow");
           setShowHeart(false);
           setTimeout(() => setMessage(""), 2000); 
         }, 800);
       };
 
       return (
-        <div className={`absolute -top-20 -right-8 z-40 cursor-pointer select-none transition-all duration-300 ${animationClass}`} onClick={handleClick}>
-          {showHeart && <div className="absolute top-10 left-1/2 -translate-x-1/2 -translate-y-12 animate-float-up opacity-0 z-50"><Heart size={20} className="fill-rose-300 text-rose-300 drop-shadow-sm" /></div>}
-          {message && <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/90 text-slate-600 border border-slate-100 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-sm animate-pop-in z-50">{message}</div>}
-          <svg width="140" height="140" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className="absolute -top-16 -right-6 z-40 cursor-pointer select-none animate-float-gentle" onClick={handleClick}>
+          {showHeart && <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-12 animate-float-up opacity-0 z-50"><Heart size={24} className="fill-rose-300 text-rose-300 drop-shadow-sm" /></div>}
+          
+          {/* 修改点：字体变大了 (text-sm) */}
+          {message && <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white/95 text-slate-700 border border-slate-100 text-sm font-black px-3 py-2 rounded-xl whitespace-nowrap shadow-md animate-pop-in z-50">{message}</div>}
+          
+          {/* 修改点：无腿的云朵羊 SVG */}
+          <svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-md">
             <defs>
-              <filter id="fuzzy" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" /><feGaussianBlur stdDeviation="0.5" /></filter>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="0.8" /></filter>
             </defs>
-            <g transform="translate(20, 30)" filter="url(#fuzzy)">
-              <path d="M40 90 Q35 110 35 130 L45 130 L45 110 M110 90 Q115 110 115 130 L105 130 L105 110 M50 80 Q30 80 25 65 Q20 45 45 40 L100 40 Q125 45 120 65 Q115 80 100 80 Z" fill="#fdfbf7" stroke="none" />
-              <path d="M38 100 L35 135" stroke="#fdfbf7" strokeWidth="12" strokeLinecap="round" />
-              <path d="M55 100 L58 132" stroke="#fdfbf7" strokeWidth="12" strokeLinecap="round" />
-              <path d="M95 100 L92 135" stroke="#fdfbf7" strokeWidth="12" strokeLinecap="round" />
-              <path d="M112 100 L115 132" stroke="#fdfbf7" strokeWidth="12" strokeLinecap="round" />
-              <g transform="translate(20, 20)">
-                <path d="M15 35 Q5 35 5 25 Q15 15 25 25" fill="#fecaca" />
-                <path d="M65 35 Q75 35 75 25 Q65 15 55 25" fill="#fecaca" />
-                <ellipse cx="40" cy="35" rx="28" ry="24" fill="#fdfbf7" />
-                <circle cx="28" cy="32" r="2.5" fill="#2c2c2c" opacity="0.8" />
-                <circle cx="52" cy="32" r="2.5" fill="#2c2c2c" opacity="0.8" />
-                <path d="M37 40 L43 40 L40 44 Z" fill="#fca5a5" />
-                <path d="M40 44 L40 48" stroke="#2c2c2c" strokeWidth="1" opacity="0.3"/>
-                <circle cx="22" cy="40" r="4" fill="#fecaca" opacity="0.4" filter="url(#fuzzy)" />
-                <circle cx="58" cy="40" r="4" fill="#fecaca" opacity="0.4" filter="url(#fuzzy)" />
-              </g>
-              <circle cx="120" cy="60" r="8" fill="#fdfbf7" />
+            {/* 身体 */}
+            <path d="M30 50 Q20 50 20 35 Q20 15 40 15 Q50 5 70 10 Q90 0 105 15 Q120 15 120 35 Q120 55 105 60 L30 60 Z" fill="#ffffff" />
+            
+            {/* 脸部 */}
+            <g transform="translate(25, 30)">
+               <ellipse cx="0" cy="5" rx="6" ry="3" fill="#fca5a5" transform="rotate(-20)"/>
+               <ellipse cx="30" cy="5" rx="6" ry="3" fill="#fca5a5" transform="rotate(20)"/>
+               <circle cx="5" cy="10" r="2.5" fill="#1e293b" />
+               <circle cx="25" cy="10" r="2.5" fill="#1e293b" />
+               <circle cx="0" cy="14" r="3" fill="#fecaca" opacity="0.6" filter="url(#soft)"/>
+               <circle cx="30" cy="14" r="3" fill="#fecaca" opacity="0.6" filter="url(#soft)"/>
+               <path d="M14 14 L16 14 L15 16 Z" fill="#fca5a5" />
             </g>
-            <ellipse cx="90" cy="160" rx="50" ry="6" fill="#86efac" opacity="0.2" filter="url(#fuzzy)" />
+            <circle cx="115" cy="45" r="6" fill="#ffffff" />
           </svg>
         </div>
       );
@@ -157,7 +155,7 @@
       );
     };
 
-    // --- 添加回忆弹窗 ---
+    // --- 添加回忆弹窗 (旧版简洁风格) ---
     const AddMemoryModal = ({ isOpen, onClose, onAdd }) => {
       const [title, setTitle] = useState("");
       const [date, setDate] = useState("");
@@ -227,7 +225,7 @@
     };
 
     // --- 数据分析管理表格 ---
-    const InsightsManager = ({ data, onUpdate, onDelete, onAdd, onExport, onImport }) => {
+    const InsightsManager = ({ data, onDelete, onAdd, onExport, onImport }) => {
       const [newEvent, setNewEvent] = useState("");
       const [newDuration, setNewDuration] = useState("");
       const [newGap, setNewGap] = useState("");
@@ -294,7 +292,6 @@
     };
 
     function App() {
-      // 核心数据状态 (从 LocalStorage 读取)
       const [memories, setMemories] = useState(() => {
         try {
           const saved = localStorage.getItem('love_memories');
@@ -314,11 +311,9 @@
       const [selectedImage, setSelectedImage] = useState(null);
       const [isModalOpen, setIsModalOpen] = useState(false);
 
-      // 数据持久化
       useEffect(() => { localStorage.setItem('love_memories', JSON.stringify(memories)); }, [memories]);
       useEffect(() => { localStorage.setItem('love_insights', JSON.stringify(insightsData)); }, [insightsData]);
 
-      // 计时器
       useEffect(() => {
         const start = new Date(START_DATE).getTime();
         const now = new Date().getTime();
@@ -326,24 +321,10 @@
         setDays(Math.floor(diff / (1000 * 60 * 60 * 24)));
       }, []);
 
-      // CRUD 操作
-      const handleAddMemory = (newMemory) => {
-        setMemories([{ id: Date.now(), ...newMemory }, ...memories]);
-      };
-
-      const handleDeleteMemory = (id) => {
-        if(confirm("确定要删除这个美好回忆吗？")) {
-          setMemories(memories.filter(m => m.id !== id));
-        }
-      };
-
-      const handleAddInsight = (newItem) => {
-        setInsightsData([...insightsData, { id: Date.now(), ...newItem }]);
-      };
-
-      const handleDeleteInsight = (id) => {
-        setInsightsData(insightsData.filter(i => i.id !== id));
-      };
+      const handleAddMemory = (newMemory) => { setMemories([{ id: Date.now(), ...newMemory }, ...memories]); };
+      const handleDeleteMemory = (id) => { if(confirm("确定要删除这个美好回忆吗？")) setMemories(memories.filter(m => m.id !== id)); };
+      const handleAddInsight = (newItem) => { setInsightsData([...insightsData, { id: Date.now(), ...newItem }]); };
+      const handleDeleteInsight = (id) => { setInsightsData(insightsData.filter(i => i.id !== id)); };
 
       // --- 备份与恢复核心逻辑 ---
       const handleExportData = () => {
@@ -362,7 +343,6 @@
       const handleImportData = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
         const reader = new FileReader();
         reader.onload = (event) => {
           try {
@@ -403,7 +383,7 @@
           {/* 添加弹窗 */}
           <AddMemoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddMemory} />
 
-          {/* 悬浮按钮 (只在 Feed 和 Grid 显示) */}
+          {/* 悬浮按钮 */}
           {(view === 'feed' || view === 'grid') && (
             <button onClick={() => setIsModalOpen(true)} className="fixed bottom-8 right-8 z-50 bg-sky-500 text-white p-4 rounded-full shadow-xl shadow-sky-300 hover:scale-110 hover:bg-sky-600 transition-all active:scale-95 group">
               <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -437,19 +417,11 @@
               <p className="text-slate-500 font-bold tracking-wide text-lg max-w-md">Since {START_DATE}</p>
             </div>
 
-            {/* --- Moments (Feed) 视图 --- */}
             {view === 'feed' && (
               <div className="space-y-12 animate-fade-in-up">
                 {memories.map((place, idx) => (
                   <div key={place.id} className={`group relative bg-white rounded-[2rem] p-4 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(14,165,233,0.15)] transition-all duration-500 border border-slate-200 flex flex-col md:flex-row gap-6 ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''} hover:-translate-y-1`}>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); handleDeleteMemory(place.id); }} 
-                      className="absolute top-4 left-4 z-30 bg-white/80 p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-white opacity-0 group-hover:opacity-100 transition-all"
-                      title="Delete Memory"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteMemory(place.id); }} className="absolute top-4 left-4 z-30 bg-white/80 p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-white opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={18} /></button>
                     {place.hasSheep && <AnimatedSheep />}
                     <div className="w-full md:w-1/2 aspect-[4/3] rounded-[1.5rem] overflow-hidden relative cursor-zoom-in" onClick={() => setSelectedImage(place.image)}>
                       <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors duration-500 z-10"></div>
@@ -469,7 +441,6 @@
               </div>
             )}
 
-            {/* --- Gallery (Grid) 视图 [自动同步] --- */}
             {view === 'grid' && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in-up">
                 {memories.map((memory, i) => (
@@ -487,10 +458,8 @@
               </div>
             )}
 
-            {/* --- Insights (Stats) 视图 --- */}
             {view === 'stats' && (
               <div className="space-y-6 animate-fade-in-up">
-                {/* 统计卡片 (自动计算) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40">
                     <div className="flex items-center gap-2 text-slate-400"><Calendar size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Memories</span></div>
@@ -498,35 +467,20 @@
                   </div>
                   <div className="bg-gradient-to-br from-sky-500 to-blue-600 p-6 rounded-[2rem] shadow-lg shadow-sky-200 flex flex-col justify-between h-40 text-white">
                     <div className="flex items-center gap-2 text-sky-100"><TrendingUp size={18} /><span className="text-xs font-bold uppercase tracking-wide">Avg Mood</span></div>
-                    <div>
-                      <span className="text-5xl font-black">
-                        {insightsData.length > 0 ? (insightsData.reduce((acc, cur) => acc + cur.mood, 0) / insightsData.length).toFixed(1) : 0}
-                      </span>
-                      <span className="text-sm text-sky-100 ml-1 font-bold">/10</span>
-                    </div>
+                    <div><span className="text-5xl font-black">{insightsData.length > 0 ? (insightsData.reduce((acc, cur) => acc + cur.mood, 0) / insightsData.length).toFixed(1) : 0}</span><span className="text-sm text-sky-100 ml-1 font-bold">/10</span></div>
                   </div>
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40">
                     <div className="flex items-center gap-2 text-slate-400"><Zap size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Records</span></div>
                     <div><span className="text-5xl font-black text-slate-900">{insightsData.length}</span><span className="text-sm text-slate-400 ml-1 font-bold">entries</span></div>
                   </div>
                 </div>
-
-                {/* 动态图表 */}
                 <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm relative overflow-visible">
                   <div className="flex justify-between items-end mb-4">
                     <div><h3 className="text-2xl font-black text-slate-900">Relationship Rhythm</h3><p className="text-slate-400 font-bold text-sm">Real-time Visualization</p></div>
                   </div>
                   {insightsData.length > 0 ? <VerticalBarChart data={insightsData} /> : <div className="h-32 flex items-center justify-center text-slate-400 font-bold">暂无数据，请在下方添加</div>}
                 </div>
-
-                {/* 数据录入表格 */}
-                <InsightsManager 
-                  data={insightsData} 
-                  onAdd={handleAddInsight} 
-                  onDelete={handleDeleteInsight}
-                  onExport={handleExportData}
-                  onImport={handleImportData}
-                />
+                <InsightsManager data={insightsData} onAdd={handleAddInsight} onDelete={handleDeleteInsight} onExport={handleExportData} onImport={handleImportData} />
               </div>
             )}
           </main>
