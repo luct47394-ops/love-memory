@@ -39,12 +39,12 @@
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check, Trash2, PlusCircle } from 'lucide-react';
+    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check, Trash2, Download, Upload, Save } from 'lucide-react';
 
     // --- 配置区域 ---
     const START_DATE = "2025-10-25"; 
 
-    // 初始演示回忆
+    // 初始演示回忆 (如果没有数据时显示)
     const INITIAL_MEMORIES = [
       {
         id: 1,
@@ -227,11 +227,12 @@
     };
 
     // --- 数据分析管理表格 ---
-    const InsightsManager = ({ data, onUpdate, onDelete, onAdd }) => {
+    const InsightsManager = ({ data, onUpdate, onDelete, onAdd, onExport, onImport }) => {
       const [newEvent, setNewEvent] = useState("");
       const [newDuration, setNewDuration] = useState("");
       const [newGap, setNewGap] = useState("");
       const [newMood, setNewMood] = useState("");
+      const fileInputRef = useRef(null);
 
       const handleAdd = () => {
         if (!newEvent || !newDuration || !newGap || !newMood) return;
@@ -241,7 +242,18 @@
 
       return (
         <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm mt-8">
-          <h3 className="text-xl font-black mb-6 flex items-center gap-2"><TrendingUp size={24} className="text-sky-500"/> Data Center</h3>
+          <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <h3 className="text-xl font-black flex items-center gap-2"><TrendingUp size={24} className="text-sky-500"/> Data Center</h3>
+            <div className="flex gap-2">
+              <button onClick={onExport} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full text-xs font-bold text-slate-600 transition-colors">
+                <Download size={14} /> Backup
+              </button>
+              <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-600 rounded-full text-xs font-bold text-white transition-colors shadow-sm">
+                <Upload size={14} /> Restore
+              </button>
+              <input type="file" ref={fileInputRef} className="hidden" accept=".json" onChange={onImport} />
+            </div>
+          </div>
           
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
@@ -311,7 +323,6 @@
         const start = new Date(START_DATE).getTime();
         const now = new Date().getTime();
         const diff = now - start;
-        // 如果是未来日期，显示负数或者0
         setDays(Math.floor(diff / (1000 * 60 * 60 * 24)));
       }, []);
 
@@ -332,6 +343,44 @@
 
       const handleDeleteInsight = (id) => {
         setInsightsData(insightsData.filter(i => i.id !== id));
+      };
+
+      // --- 备份与恢复核心逻辑 ---
+      const handleExportData = () => {
+        const dataStr = JSON.stringify({ memories, insightsData }, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `love_memory_backup_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      const handleImportData = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const importedData = JSON.parse(event.target.result);
+            if (importedData.memories && importedData.insightsData) {
+              if(confirm("导入将覆盖当前所有数据，确定要恢复备份吗？")) {
+                setMemories(importedData.memories);
+                setInsightsData(importedData.insightsData);
+                alert("数据恢复成功！✨");
+              }
+            } else {
+              alert("文件格式不对哦，请确认是正确的备份文件。");
+            }
+          } catch (err) {
+            alert("读取文件失败，数据可能已损坏。");
+          }
+        };
+        reader.readAsText(file);
       };
 
       return (
@@ -393,7 +442,6 @@
               <div className="space-y-12 animate-fade-in-up">
                 {memories.map((place, idx) => (
                   <div key={place.id} className={`group relative bg-white rounded-[2rem] p-4 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(14,165,233,0.15)] transition-all duration-500 border border-slate-200 flex flex-col md:flex-row gap-6 ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''} hover:-translate-y-1`}>
-                    {/* 删除按钮 */}
                     <button 
                       onClick={(e) => { e.stopPropagation(); handleDeleteMemory(place.id); }} 
                       className="absolute top-4 left-4 z-30 bg-white/80 p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-white opacity-0 group-hover:opacity-100 transition-all"
@@ -475,7 +523,9 @@
                 <InsightsManager 
                   data={insightsData} 
                   onAdd={handleAddInsight} 
-                  onDelete={handleDeleteInsight} 
+                  onDelete={handleDeleteInsight}
+                  onExport={handleExportData}
+                  onImport={handleImportData}
                 />
               </div>
             )}
