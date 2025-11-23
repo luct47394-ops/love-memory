@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我们的时光纪念册</title>
-  <!-- 引入 Tailwind CSS (样式) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 引入 React 和 Babel (运行库) -->
   <script type="importmap">
     {
       "imports": {
@@ -19,7 +17,6 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <style>
-    /* 动画样式定义 */
     @keyframes breathe-slow { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.02) translateY(-2px); } }
     @keyframes wiggle-soft { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
     @keyframes bounce-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -30,8 +27,8 @@
     .animate-bounce-soft { animation: bounce-soft 0.6s ease-in-out; }
     .animate-float-up { animation: float-up 1.5s ease-out forwards; }
     .animate-pop-in { animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .animate-pulse-slow { animation: pulseSlow 8s infinite ease-in-out; }
     @keyframes pulseSlow { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } }
+    .animate-pulse-slow { animation: pulseSlow 8s infinite ease-in-out; }
     .animation-delay-2000 { animation-delay: 2s; }
     .animation-delay-4000 { animation-delay: 4s; }
   </style>
@@ -39,70 +36,44 @@
 <body class="bg-slate-100 text-slate-900">
   <div id="root"></div>
 
-  <!-- React 代码逻辑 -->
   <script type="text/babel" data-type="module">
     import React, { useState, useEffect, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
-    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check } from 'lucide-react';
+    import { Grid, LayoutTemplate, MapPin, ArrowUpRight, BarChart3, TrendingUp, Calendar, Zap, Sparkles, X, Heart, Plus, Image as ImageIcon, Check, Trash2, PlusCircle } from 'lucide-react';
 
-    // --- 初始数据 ---
-    const INITIAL_PLACES = [
+    // --- 配置区域 ---
+    const START_DATE = "2025-10-25"; 
+
+    // 初始演示回忆
+    const INITIAL_MEMORIES = [
       {
         id: 1,
-        year: "2023",
-        date: "Jul 15",
-        title: "第一次看海",
-        image: "https://images.unsplash.com/photo-1473116763249-2faaef81ccda?q=80&w=1200&auto=format&fit=crop",
+        title: "官宣的那一天",
+        date: "Oct 25, 2025",
+        location: "Our Special Place",
+        image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop",
         hasSheep: true 
-      },
-      {
-        id: 2,
-        year: "2023",
-        date: "Dec 24",
-        title: "迪士尼之夜",
-        image: "https://images.unsplash.com/photo-1545580266-991753381a8f?q=80&w=1200&auto=format&fit=crop",
-        hasSheep: false
-      },
-      {
-        id: 3,
-        year: "2024",
-        date: "Apr 10",
-        title: "森林公园野餐",
-        image: "https://images.unsplash.com/photo-1533236025519-5835c67e9f34?q=80&w=1200&auto=format&fit=crop",
-        hasSheep: false
       }
     ];
 
-    const INITIAL_FOODS = [
-      {
-        id: 1,
-        title: "深夜拉面",
-        rating: "5.0",
-        image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=800&auto=format&fit=crop"
-      },
-      {
-        id: 2,
-        title: "生日蛋糕",
-        rating: "4.8",
-        image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=800&auto=format&fit=crop"
-      }
+    // 初始演示数据分析
+    const INITIAL_INSIGHTS = [
+      { id: 1, event: "First Date", duration: 1, gap: 0, mood: 9.5 },
+      { id: 2, event: "Weekend", duration: 2, gap: 5, mood: 8.8 },
     ];
 
-    const START_DATE = "2023-05-20"; 
-
-    // Logo
+    // --- Logo ---
     const LogoModernist = () => (
       <svg width="48" height="32" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M5 20 C 15 5, 25 35, 35 20 S 55 5, 55 20" stroke="#0284c7" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     );
 
-    // 小羊
+    // --- 棉花糖小羊 ---
     const AnimatedSheep = () => {
       const [animationClass, setAnimationClass] = useState("animate-breathe-slow");
       const [message, setMessage] = useState("");
       const [showHeart, setShowHeart] = useState(false);
-
       const messages = ["咩~", "带我走!", "好想你!", "饿饿~", "贴贴 ❤️", "去玩嘛!", "再点一下!"];
 
       const handleClick = (e) => {
@@ -111,7 +82,6 @@
         const actions = ["animate-bounce-soft", "animate-wiggle-soft"];
         setAnimationClass(actions[Math.floor(Math.random() * actions.length)]);
         setMessage(messages[Math.floor(Math.random() * messages.length)]);
-
         setTimeout(() => {
           setAnimationClass("animate-breathe-slow");
           setShowHeart(false);
@@ -121,23 +91,11 @@
 
       return (
         <div className={`absolute -top-20 -right-8 z-40 cursor-pointer select-none transition-all duration-300 ${animationClass}`} onClick={handleClick}>
-          {showHeart && (
-            <div className="absolute top-10 left-1/2 -translate-x-1/2 -translate-y-12 animate-float-up opacity-0 z-50">
-              <Heart size={20} className="fill-rose-300 text-rose-300 drop-shadow-sm" />
-            </div>
-          )}
-          {message && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/90 text-slate-600 border border-slate-100 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-sm animate-pop-in z-50">
-              {message}
-            </div>
-          )}
+          {showHeart && <div className="absolute top-10 left-1/2 -translate-x-1/2 -translate-y-12 animate-float-up opacity-0 z-50"><Heart size={20} className="fill-rose-300 text-rose-300 drop-shadow-sm" /></div>}
+          {message && <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white/90 text-slate-600 border border-slate-100 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-sm animate-pop-in z-50">{message}</div>}
           <svg width="140" height="140" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <filter id="fuzzy" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
-                <feGaussianBlur stdDeviation="0.5" />
-              </filter>
+              <filter id="fuzzy" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" /><feGaussianBlur stdDeviation="0.5" /></filter>
             </defs>
             <g transform="translate(20, 30)" filter="url(#fuzzy)">
               <path d="M40 90 Q35 110 35 130 L45 130 L45 110 M110 90 Q115 110 115 130 L105 130 L105 110 M50 80 Q30 80 25 65 Q20 45 45 40 L100 40 Q125 45 120 65 Q115 80 100 80 Z" fill="#fdfbf7" stroke="none" />
@@ -164,9 +122,9 @@
       );
     };
 
-    // 柱状图
+    // --- 图表组件 ---
     const VerticalBarChart = ({ data }) => {
-      const maxVal = 35; 
+      const maxVal = Math.max(...data.map(d => Math.max(d.duration, d.gap)), 10) * 1.2; 
       const [hoverId, setHoverId] = useState(null);
 
       return (
@@ -199,10 +157,11 @@
       );
     };
 
-    // 添加回忆的弹窗
+    // --- 添加回忆弹窗 ---
     const AddMemoryModal = ({ isOpen, onClose, onAdd }) => {
       const [title, setTitle] = useState("");
       const [date, setDate] = useState("");
+      const [location, setLocation] = useState("");
       const [image, setImage] = useState(null); 
       const [hasSheep, setHasSheep] = useState(false);
       const fileInputRef = useRef(null);
@@ -210,12 +169,8 @@
       const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-          // 这里使用 FileReader 将图片转换为 Base64 字符串
-          // 这样图片才能在 LocalStorage 中保存，或者在关闭浏览器后还能显示
           const reader = new FileReader();
-          reader.onloadend = () => {
-             setImage(reader.result);
-          };
+          reader.onloadend = () => setImage(reader.result);
           reader.readAsDataURL(file);
         }
       };
@@ -226,21 +181,11 @@
 
         const dateObj = new Date(date);
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}`;
-        const year = dateObj.getFullYear().toString();
+        const formattedDate = `${monthNames[dateObj.getMonth()]} ${dateObj.getDate()}, ${dateObj.getFullYear()}`;
 
-        onAdd({
-          title,
-          date: formattedDate,
-          year,
-          image,
-          hasSheep
-        });
+        onAdd({ title, date: formattedDate, location: location || "Secret Place", image, hasSheep });
         
-        setTitle("");
-        setDate("");
-        setImage(null);
-        setHasSheep(false);
+        setTitle(""); setDate(""); setLocation(""); setImage(null); setHasSheep(false);
         onClose();
       };
 
@@ -251,14 +196,11 @@
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
           <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative z-10 animate-pop-in border border-slate-100">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-black text-slate-800">New Memory</h3>
+              <h3 className="text-xl font-black text-slate-800">Add New Memory</h3>
               <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full"><X size={24} className="text-slate-500" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div 
-                className="w-full aspect-[2/1] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 hover:border-sky-300 transition-all overflow-hidden relative group"
-                onClick={() => fileInputRef.current?.click()}
-              >
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="w-full aspect-[2/1] bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 hover:border-sky-300 transition-all overflow-hidden relative group" onClick={() => fileInputRef.current?.click()}>
                 {image ? (
                   <>
                     <img src={image} alt="Preview" className="w-full h-full object-cover" />
@@ -269,14 +211,10 @@
                 )}
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
               </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Title</label>
-                <input type="text" placeholder="e.g. Summer Beach" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" value={title} onChange={(e) => setTitle(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Date</label>
-                <input type="date" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
+              <input type="text" placeholder="Title (e.g. First Kiss)" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" value={title} onChange={(e) => setTitle(e.target.value)} />
+              <input type="date" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" value={date} onChange={(e) => setDate(e.target.value)} />
+              <input type="text" placeholder="Location (e.g. Taipei 101)" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" value={location} onChange={(e) => setLocation(e.target.value)} />
+              
               <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 cursor-pointer" onClick={() => setHasSheep(!hasSheep)}>
                 <div className="flex items-center gap-3"><Sparkles size={20} className={hasSheep ? "text-sky-500" : "text-slate-400"} /><span className="font-bold text-slate-700">Add Little Sheep?</span></div>
                 <div className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${hasSheep ? 'bg-sky-500' : 'bg-slate-300'}`}><div className={`w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform duration-300 ${hasSheep ? 'translate-x-6' : 'translate-x-0'}`}></div></div>
@@ -288,35 +226,112 @@
       );
     };
 
+    // --- 数据分析管理表格 ---
+    const InsightsManager = ({ data, onUpdate, onDelete, onAdd }) => {
+      const [newEvent, setNewEvent] = useState("");
+      const [newDuration, setNewDuration] = useState("");
+      const [newGap, setNewGap] = useState("");
+      const [newMood, setNewMood] = useState("");
+
+      const handleAdd = () => {
+        if (!newEvent || !newDuration || !newGap || !newMood) return;
+        onAdd({ event: newEvent, duration: Number(newDuration), gap: Number(newGap), mood: Number(newMood) });
+        setNewEvent(""); setNewDuration(""); setNewGap(""); setNewMood("");
+      };
+
+      return (
+        <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm mt-8">
+          <h3 className="text-xl font-black mb-6 flex items-center gap-2"><TrendingUp size={24} className="text-sky-500"/> Data Center</h3>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+                <tr>
+                  <th className="px-4 py-3 rounded-l-lg">Event</th>
+                  <th className="px-4 py-3">Together (Days)</th>
+                  <th className="px-4 py-3">Gap (Days)</th>
+                  <th className="px-4 py-3">Mood</th>
+                  <th className="px-4 py-3 rounded-r-lg">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row) => (
+                  <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="px-4 py-3 font-bold">{row.event}</td>
+                    <td className="px-4 py-3 text-sky-600 font-bold">{row.duration}</td>
+                    <td className="px-4 py-3 text-slate-400 font-bold">{row.gap}</td>
+                    <td className="px-4 py-3 font-bold text-yellow-500">{row.mood}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => onDelete(row.id)} className="text-rose-400 hover:text-rose-600 p-1"><Trash2 size={16}/></button>
+                    </td>
+                  </tr>
+                ))}
+                {/* 添加行 */}
+                <tr className="bg-sky-50/50">
+                  <td className="px-2 py-2"><input type="text" placeholder="New Event" className="w-full bg-transparent border-b border-sky-200 focus:outline-none text-xs font-bold p-1" value={newEvent} onChange={e => setNewEvent(e.target.value)} /></td>
+                  <td className="px-2 py-2"><input type="number" placeholder="Days" className="w-full bg-transparent border-b border-sky-200 focus:outline-none text-xs p-1" value={newDuration} onChange={e => setNewDuration(e.target.value)} /></td>
+                  <td className="px-2 py-2"><input type="number" placeholder="Days" className="w-full bg-transparent border-b border-sky-200 focus:outline-none text-xs p-1" value={newGap} onChange={e => setNewGap(e.target.value)} /></td>
+                  <td className="px-2 py-2"><input type="number" placeholder="0-10" className="w-full bg-transparent border-b border-sky-200 focus:outline-none text-xs p-1" value={newMood} onChange={e => setNewMood(e.target.value)} /></td>
+                  <td className="px-2 py-2"><button onClick={handleAdd} className="bg-sky-500 text-white rounded-full p-1 hover:bg-sky-600"><Plus size={16}/></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    };
+
     function App() {
-      // 从 LocalStorage 读取数据
-      const [places, setPlaces] = useState(() => {
+      // 核心数据状态 (从 LocalStorage 读取)
+      const [memories, setMemories] = useState(() => {
         try {
-          const saved = localStorage.getItem('memory_places');
-          return saved ? JSON.parse(saved) : INITIAL_PLACES;
-        } catch(e) { return INITIAL_PLACES; }
+          const saved = localStorage.getItem('love_memories');
+          return saved ? JSON.parse(saved) : INITIAL_MEMORIES;
+        } catch(e) { return INITIAL_MEMORIES; }
+      });
+
+      const [insightsData, setInsightsData] = useState(() => {
+        try {
+          const saved = localStorage.getItem('love_insights');
+          return saved ? JSON.parse(saved) : INITIAL_INSIGHTS;
+        } catch(e) { return INITIAL_INSIGHTS; }
       });
       
-      const [foods] = useState(INITIAL_FOODS);
       const [days, setDays] = useState(0);
       const [view, setView] = useState('feed');
       const [selectedImage, setSelectedImage] = useState(null);
       const [isModalOpen, setIsModalOpen] = useState(false);
 
-      useEffect(() => {
-        localStorage.setItem('memory_places', JSON.stringify(places));
-      }, [places]);
+      // 数据持久化
+      useEffect(() => { localStorage.setItem('love_memories', JSON.stringify(memories)); }, [memories]);
+      useEffect(() => { localStorage.setItem('love_insights', JSON.stringify(insightsData)); }, [insightsData]);
 
+      // 计时器
       useEffect(() => {
         const start = new Date(START_DATE).getTime();
         const now = new Date().getTime();
         const diff = now - start;
+        // 如果是未来日期，显示负数或者0
         setDays(Math.floor(diff / (1000 * 60 * 60 * 24)));
       }, []);
 
+      // CRUD 操作
       const handleAddMemory = (newMemory) => {
-        const memoryObj = { id: Date.now(), ...newMemory };
-        setPlaces([memoryObj, ...places]);
+        setMemories([{ id: Date.now(), ...newMemory }, ...memories]);
+      };
+
+      const handleDeleteMemory = (id) => {
+        if(confirm("确定要删除这个美好回忆吗？")) {
+          setMemories(memories.filter(m => m.id !== id));
+        }
+      };
+
+      const handleAddInsight = (newItem) => {
+        setInsightsData([...insightsData, { id: Date.now(), ...newItem }]);
+      };
+
+      const handleDeleteInsight = (id) => {
+        setInsightsData(insightsData.filter(i => i.id !== id));
       };
 
       return (
@@ -339,12 +354,14 @@
           {/* 添加弹窗 */}
           <AddMemoryModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddMemory} />
 
-          {/* 悬浮按钮 */}
-          <button onClick={() => setIsModalOpen(true)} className="fixed bottom-8 right-8 z-50 bg-sky-500 text-white p-4 rounded-full shadow-xl shadow-sky-300 hover:scale-110 hover:bg-sky-600 transition-all active:scale-95 group">
-            <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
+          {/* 悬浮按钮 (只在 Feed 和 Grid 显示) */}
+          {(view === 'feed' || view === 'grid') && (
+            <button onClick={() => setIsModalOpen(true)} className="fixed bottom-8 right-8 z-50 bg-sky-500 text-white p-4 rounded-full shadow-xl shadow-sky-300 hover:scale-110 hover:bg-sky-600 transition-all active:scale-95 group">
+              <Plus size={32} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
+            </button>
+          )}
 
-          {/* 头部 */}
+          {/* 头部导航 */}
           <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm px-6 py-4 flex justify-between items-center max-w-6xl mx-auto w-full rounded-b-2xl md:rounded-none">
             <div className="flex items-center gap-2 cursor-pointer hover:scale-105 transition-transform"><LogoModernist /></div>
             <div className="bg-slate-100 p-1 rounded-full flex backdrop-blur-md border border-slate-200">
@@ -366,15 +383,25 @@
                 <Sparkles size={14} className="text-sky-500 fill-sky-500" /><span className="text-sky-700 text-xs font-bold uppercase tracking-widest">Our Journey</span>
               </div>
               <h1 className="text-[6rem] md:text-[10rem] font-black tracking-tighter leading-none text-slate-900 select-none drop-shadow-sm">
-                {days}<span className="text-3xl md:text-5xl text-sky-500 ml-4 font-extrabold tracking-normal">DAYS</span>
+                {Math.abs(days)}<span className="text-3xl md:text-5xl text-sky-500 ml-4 font-extrabold tracking-normal">DAYS</span>
               </h1>
-              <p className="text-slate-500 font-bold tracking-wide text-lg max-w-md">Collecting moments, calculating the infinite value of <span className="text-sky-600 underline decoration-4 decoration-sky-300 underline-offset-4">us</span>.</p>
+              <p className="text-slate-500 font-bold tracking-wide text-lg max-w-md">Since {START_DATE}</p>
             </div>
 
+            {/* --- Moments (Feed) 视图 --- */}
             {view === 'feed' && (
               <div className="space-y-12 animate-fade-in-up">
-                {places.map((place, idx) => (
+                {memories.map((place, idx) => (
                   <div key={place.id} className={`group relative bg-white rounded-[2rem] p-4 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(14,165,233,0.15)] transition-all duration-500 border border-slate-200 flex flex-col md:flex-row gap-6 ${idx % 2 !== 0 ? 'md:flex-row-reverse' : ''} hover:-translate-y-1`}>
+                    {/* 删除按钮 */}
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteMemory(place.id); }} 
+                      className="absolute top-4 left-4 z-30 bg-white/80 p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-white opacity-0 group-hover:opacity-100 transition-all"
+                      title="Delete Memory"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+
                     {place.hasSheep && <AnimatedSheep />}
                     <div className="w-full md:w-1/2 aspect-[4/3] rounded-[1.5rem] overflow-hidden relative cursor-zoom-in" onClick={() => setSelectedImage(place.image)}>
                       <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/5 transition-colors duration-500 z-10"></div>
@@ -383,28 +410,28 @@
                     </div>
                     <div className="flex-1 flex flex-col justify-center p-2 md:p-6">
                       <div className="flex items-center gap-3 mb-4">
-                        <span className="px-3 py-1 bg-sky-100 text-sky-700 rounded-lg text-xs font-black uppercase tracking-wider">{place.year}</span>
                         <span className="text-slate-400 text-sm font-bold tracking-wide">{place.date}</span>
                       </div>
                       <h2 className="text-4xl md:text-5xl font-black leading-tight text-slate-900 mb-6 group-hover:text-sky-600 transition-colors duration-300">{place.title}</h2>
-                      <div className="mt-auto flex items-center gap-2 text-slate-500 font-bold text-sm"><MapPin size={18} className="text-sky-500 fill-sky-100" /><span>Checked in</span></div>
+                      <div className="mt-auto flex items-center gap-2 text-slate-500 font-bold text-sm"><MapPin size={18} className="text-sky-500 fill-sky-100" /><span>{place.location}</span></div>
                     </div>
                   </div>
                 ))}
+                {memories.length === 0 && <div className="text-center text-slate-400 py-20 font-bold">暂无回忆，快去添加吧！</div>}
               </div>
             )}
 
+            {/* --- Gallery (Grid) 视图 [自动同步] --- */}
             {view === 'grid' && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in-up">
-                {foods.map((food, i) => (
-                  <div key={food.id} className={`relative rounded-[2rem] overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 group cursor-pointer ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => setSelectedImage(food.image)}>
+                {memories.map((memory, i) => (
+                  <div key={memory.id} className={`relative rounded-[2rem] overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100 group cursor-pointer ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''}`} onClick={() => setSelectedImage(memory.image)}>
                     <div className={`w-full ${i === 0 ? 'h-[500px]' : 'h-[240px]'} overflow-hidden`}>
-                      <img src={food.image} alt={food.title} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" />
+                      <img src={memory.image} alt={memory.title} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105" />
                     </div>
                     <div className="absolute bottom-4 left-4 right-4">
                       <div className="bg-white/95 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg flex justify-between items-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <span className="font-extrabold text-slate-900">{food.title}</span>
-                        <span className="text-sky-600 text-xs font-black bg-sky-50 px-2 py-1 rounded-md">★ {food.rating}</span>
+                        <span className="font-extrabold text-slate-900 truncate pr-2">{memory.title}</span>
                       </div>
                     </div>
                   </div>
@@ -412,37 +439,44 @@
               </div>
             )}
 
+            {/* --- Insights (Stats) 视图 --- */}
             {view === 'stats' && (
               <div className="space-y-6 animate-fade-in-up">
+                {/* 统计卡片 (自动计算) */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40 hover:border-sky-300 transition-colors">
-                    <div className="flex items-center gap-2 text-slate-400"><Calendar size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Avg. Gap</span></div>
-                    <div><span className="text-5xl font-black text-slate-900">12.8</span><span className="text-sm text-slate-400 ml-1 font-bold">days</span></div>
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40">
+                    <div className="flex items-center gap-2 text-slate-400"><Calendar size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Memories</span></div>
+                    <div><span className="text-5xl font-black text-slate-900">{memories.length}</span><span className="text-sm text-slate-400 ml-1 font-bold">counts</span></div>
                   </div>
                   <div className="bg-gradient-to-br from-sky-500 to-blue-600 p-6 rounded-[2rem] shadow-lg shadow-sky-200 flex flex-col justify-between h-40 text-white">
-                    <div className="flex items-center gap-2 text-sky-100"><TrendingUp size={18} /><span className="text-xs font-bold uppercase tracking-wide">Mood</span></div>
-                    <div><span className="text-5xl font-black">9.4</span><span className="text-sm text-sky-100 ml-1 font-bold">/10</span></div>
+                    <div className="flex items-center gap-2 text-sky-100"><TrendingUp size={18} /><span className="text-xs font-bold uppercase tracking-wide">Avg Mood</span></div>
+                    <div>
+                      <span className="text-5xl font-black">
+                        {insightsData.length > 0 ? (insightsData.reduce((acc, cur) => acc + cur.mood, 0) / insightsData.length).toFixed(1) : 0}
+                      </span>
+                      <span className="text-sm text-sky-100 ml-1 font-bold">/10</span>
+                    </div>
                   </div>
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40 hover:border-sky-300 transition-colors">
-                    <div className="flex items-center gap-2 text-slate-400"><Zap size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Streak</span></div>
-                    <div><span className="text-5xl font-black text-slate-900">5</span><span className="text-sm text-slate-400 ml-1 font-bold">days max</span></div>
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 flex flex-col justify-between h-40">
+                    <div className="flex items-center gap-2 text-slate-400"><Zap size={18} className="text-sky-500" /><span className="text-xs font-bold uppercase tracking-wide">Records</span></div>
+                    <div><span className="text-5xl font-black text-slate-900">{insightsData.length}</span><span className="text-sm text-slate-400 ml-1 font-bold">entries</span></div>
                   </div>
                 </div>
+
+                {/* 动态图表 */}
                 <div className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm relative overflow-visible">
                   <div className="flex justify-between items-end mb-4">
-                    <div><h3 className="text-2xl font-black text-slate-900">Relationship Rhythm</h3><p className="text-slate-400 font-bold text-sm">Together vs Apart</p></div>
-                    <div className="flex gap-4 text-[10px] font-bold uppercase"><div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-sky-500"></div> Together</div><div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-300"></div> Gap</div></div>
+                    <div><h3 className="text-2xl font-black text-slate-900">Relationship Rhythm</h3><p className="text-slate-400 font-bold text-sm">Real-time Visualization</p></div>
                   </div>
-                  <VerticalBarChart data={[
-                      { id: 1, event: "Meet", duration: 2, gap: 5, mood: 8.5 },
-                      { id: 2, event: "Trip", duration: 5, gap: 14, mood: 9.8 },
-                      { id: 3, event: "Wknd", duration: 2, gap: 7, mood: 9.0 },
-                      { id: 4, event: "Xmas", duration: 4, gap: 21, mood: 10.0 },
-                      { id: 5, event: "NYE", duration: 3, gap: 6, mood: 9.5 },
-                      { id: 6, event: "Park", duration: 1, gap: 12, mood: 8.8 },
-                      { id: 7, event: "Anniv", duration: 3, gap: 30, mood: 10.0 },
-                  ]} />
+                  {insightsData.length > 0 ? <VerticalBarChart data={insightsData} /> : <div className="h-32 flex items-center justify-center text-slate-400 font-bold">暂无数据，请在下方添加</div>}
                 </div>
+
+                {/* 数据录入表格 */}
+                <InsightsManager 
+                  data={insightsData} 
+                  onAdd={handleAddInsight} 
+                  onDelete={handleDeleteInsight} 
+                />
               </div>
             )}
           </main>
